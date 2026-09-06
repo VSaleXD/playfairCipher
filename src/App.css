@@ -3,7 +3,7 @@
 :root { --blue: #2878bd; --green: #37a65a; --ink: #26384b; --soft: rgba(255,255,255,.9); }
 * { box-sizing: border-box; }
 body { margin: 0; min-width: 320px; font-family: Nunito, 'Segoe UI', sans-serif; color: var(--ink); }
-.page { min-height: 100vh; background: linear-gradient(rgba(252,248,238,.78), rgba(252,248,238,.78)), url('/pic.jpg') center / cover fixed; }
+.page { min-height: 100vh; background: linear-gradient(rgba(252,248,238,.3), rgba(252,248,238,.3)), url('/pic.jpg') center / cover fixed; }
 .site-header { padding: 28px 20px 22px; color: #fff; text-align: center; background: rgba(27, 77, 118, .82); box-shadow: 0 3px 12px rgba(26, 53, 73, .18); }
 .site-header h1 { margin: 0; font-size: clamp(26px, 5vw, 40px); letter-spacing: .4px; text-shadow: 1px 2px 0 rgba(0,0,0,.14); }
 .site-header h1 span { color: #ffd45d; font-size: .8em; }
