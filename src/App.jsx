@@ -59,13 +59,20 @@ function App() {
   const [notice, setNotice] = useState('')
   const fileInput = useRef(null)
 
-  //Fungsi belum ada untuk matriks
   const updateKey = (value) => {
-
+    setKey(value)
+    setGrid(makeGrid(value))
   }
 
   const updateCell = (index, value) => {
-
+    const letter = cleanLetters(value).slice(-1)
+    if (!letter) return
+    const nextGrid = [...grid]
+    const oldIndex = nextGrid.indexOf(letter)
+    nextGrid[index] = letter
+    if (oldIndex !== -1 && oldIndex !== index) nextGrid[oldIndex] = grid[index]
+    setGrid(nextGrid)
+    setKey('Matriks manual')
   }
 
   const encrypt = () => {
@@ -101,7 +108,7 @@ function App() {
         <section className="form-container">
           <div className="form-group"><label htmlFor="key">Key word:</label><input id="key" type="text" value={key} onChange={(event) => updateKey(event.target.value)} placeholder="Enter key" /></div>
           <div className="form-group"><label htmlFor="message">Message:</label><textarea id="message" value={message} onChange={(event) => setMessage(event.target.value)} placeholder="Enter a message" /><div className="file-row"><button className="file-button" type="button" onClick={() => fileInput.current?.click()}>Upload .txt</button><input ref={fileInput} type="file" accept=".txt,text/plain" onChange={readFile} hidden /><small>J otomatis menjadi I</small></div></div>
-          <div className="matrix-section"><div className="matrix-title"><label>Playfair matrix:</label><button type="button" onClick={() => updateKey(key)}>Reset</button></div><div className="matrix">{grid.map((letter, index) => <input key={index} value={letter} maxLength={1} onChange={(event) => updateCell(index, event.target.value)} aria-label={`Matrix cell ${index + 1}`} />)}</div></div>
+          <div className="matrix-section"><div className="matrix-title"><label>Playfair matrix:</label><button type="button" onClick={() => updateKey(key)}>Reset</button></div><div className="matrix">{grid.map((letter, index) => <input key={index} value={letter} maxLength={1} onChange={(event) => updateCell(index, event.target.value)} aria-label={`Matrix cell ${index + 1}`} />)}</div></div>          
           <div className="button-row"><button className="btn btn-primary" type="button" onClick={encrypt}>Encrypt</button><button className="btn btn-success" type="button" onClick={decrypt}>Decrypt</button></div>
           {notice && <p className="notice">{notice}</p>}
         </section>
