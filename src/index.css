@@ -1,0 +1,12 @@
+* { box-sizing: border-box; }
+
+:root {
+  font-family: 'Manrope', sans-serif;
+  color: #15253a;
+  background: #f6f8f8;
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+}
+
+body { margin: 0; min-width: 320px; }
