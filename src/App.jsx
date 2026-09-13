@@ -243,7 +243,6 @@ export default function App() {
   const [activeStepIndex, setActiveStepIndex] = useState(0);
   const [toastMessage, setToastMessage] = useState("");
   const [copied, setCopied] = useState(false);
-  const [showKey, setShowKey] = useState(false);
   const [isAboutOpen, setIsAboutOpen] = useState(false);
 
   const fileInputRef = useRef(null);
@@ -402,19 +401,35 @@ export default function App() {
             className="flex items-center gap-3"
             aria-label="Playfair Cipher home"
           >
-            <span className="grid size-10 place-items-center rounded-xl bg-emerald-600 text-white shadow-sm">
-              <Icon name="lock" />
+            <span className="grid size-10 place-items-center overflow-hidden rounded-xl bg-[#eef0ff] shadow-sm">
+              <img src="/workshop.png" alt="Workshop logo" className="size-8 object-contain" />
             </span>
             <span>
               <strong className="block text-[15px] tracking-tight">
-                Playfair Cipher
+                Playfair Cipher Workshop
               </strong>
               <span className="block text-xs text-[#6b7280]">
-                Text Encryption & Decryption
+                Text Encryption & Decryption · Kelompok 4
               </span>
             </span>
           </a>
-          <nav className="flex items-center gap-5 text-sm font-medium text-[#6b7280]">
+          <nav className="flex items-center gap-2 text-sm font-medium text-[#6b7280] sm:gap-5">
+            <a
+              href="/02%20Kriptografi%20Klasik%202023.pdf"
+              target="_blank"
+              rel="noreferrer"
+              className="hidden transition hover:text-emerald-700 sm:inline"
+            >
+              Modul PDF
+            </a>
+            <a
+              href="/playfair_rawcode.cpp"
+              target="_blank"
+              rel="noreferrer"
+              className="hidden transition hover:text-emerald-700 sm:inline"
+            >
+              Source C++
+            </a>
             <button
               onClick={() => setIsAboutOpen(true)}
               className="transition hover:text-emerald-700 cursor-pointer"
@@ -608,18 +623,10 @@ export default function App() {
                   id="key"
                   value={key}
                   onChange={(e) => setKey(e.target.value)}
-                  type={showKey ? "text" : "password"}
+                  type="text"
                   placeholder="Enter your keyword or key phrase..."
-                  className="w-full rounded-xl border border-[#d9dee6] bg-white py-3 pl-10 pr-12 text-sm outline-none transition placeholder:text-[#9ca3af] focus:border-emerald-500 focus:ring-4 focus:ring-emerald-100"
+                  className="w-full rounded-xl border border-[#d9dee6] bg-white py-3 pl-10 pr-3 text-sm outline-none transition placeholder:text-[#9ca3af] focus:border-emerald-500 focus:ring-4 focus:ring-emerald-100"
                 />
-                <button
-                  type="button"
-                  onClick={() => setShowKey(!showKey)}
-                  aria-label={showKey ? "Hide key" : "Show key"}
-                  className="absolute inset-y-0 right-3 text-[#6b7280] hover:text-emerald-700 cursor-pointer"
-                >
-                  <Icon name="eye" className="h-4 w-4" />
-                </button>
               </div>
               <p className="mt-2 text-xs leading-5 text-[#6b7280]">
                 Used to generate the 5×5 Playfair matrix.
@@ -832,6 +839,18 @@ export default function App() {
             </p>
           </section>
         )}
+        <section className="mt-8 rounded-2xl border border-[#e5e7eb] bg-white p-5 shadow-[0_1px_2px_rgba(16,24,40,0.03)] sm:p-6" aria-labelledby="course-materials-title">
+          <div className="flex flex-wrap items-center justify-between gap-3">
+            <div>
+              <h2 id="course-materials-title" className="mt-1 text-lg font-bold">Module & Source code</h2>
+              <p className="mt-1 text-sm text-[#6b7280]">Learn the basics of classical cryptography and view the C++ implementation.</p>
+            </div>
+            <div className="flex flex-wrap gap-2">
+              <a href="/02%20Kriptografi%20Klasik%202023.pdf" target="_blank" rel="noreferrer" className="rounded-lg bg-emerald-600 px-3.5 py-2.5 text-xs font-bold text-white transition hover:bg-emerald-700">Open PDF Module ↗</a>
+              <a href="/playfair_rawcode.cpp" target="_blank" rel="noreferrer" className="rounded-lg border border-[#d9dee6] bg-white px-3.5 py-2.5 text-xs font-bold text-[#374151] transition hover:border-emerald-500 hover:text-emerald-700">View C++ Source ↗</a>
+            </div>
+          </div>
+        </section>
       </main>
 
       {toastMessage && (
@@ -848,20 +867,21 @@ export default function App() {
           role="dialog"
           aria-modal="true"
           aria-labelledby="about-title"
-          className="fixed inset-0 z-40 grid place-items-center bg-[#111827]/30 p-5"
+          className="fixed inset-0 z-40 grid place-items-center overflow-y-auto bg-[#111827]/30 p-5"
           onClick={() => setIsAboutOpen(false)}
         >
           <div
-            className="w-full max-w-lg rounded-2xl bg-white p-6 shadow-xl"
+            className="max-h-[calc(100dvh-2.5rem)] w-full max-w-2xl overscroll-contain overflow-y-auto rounded-2xl bg-white p-6 shadow-xl sm:p-7"
+            style={{ scrollbarGutter: "stable" }}
             onClick={(e) => e.stopPropagation()}
           >
             <div className="flex items-start justify-between">
               <div>
                 <p className="font-mono text-xs font-semibold uppercase tracking-[0.15em] text-emerald-700">
-                  About
+                  Credits
                 </p>
                 <h2 id="about-title" className="mt-2 text-xl font-bold">
-                  The Playfair Cipher
+                  Playfair Cipher Workshop
                 </h2>
               </div>
               <button
@@ -873,19 +893,34 @@ export default function App() {
                 <Icon name="close" />
               </button>
             </div>
-            <p className="mt-4 text-sm leading-6 text-[#6b7280]">
-              A classical substitution cipher that works with digraphs rather
-              than individual letters. A keyword creates the 5×5 matrix;
-              duplicate letters are removed, I and J share one cell, and each
-              pair follows the row, column, or rectangle rule.
+            <p className="mt-5 text-sm leading-6 text-[#6b7280]">
+              Tugas Mata Kuliah Keamanan Informasi, Kelompok 4, IPB University. 
+              Workshop ini dibuat untuk mempelajari cara kerja enkripsi klasik 
+              Playfair Cipher, termasuk proses enkripsi dan dekripsi teks menggunakan kunci tertentu
             </p>
-            <button
-              type="button"
-              onClick={() => setIsAboutOpen(false)}
-              className="mt-6 rounded-lg bg-emerald-600 px-4 py-2.5 text-sm font-bold text-white hover:bg-emerald-700 cursor-pointer"
-            >
-              Got it
-            </button>
+            <div className="mt-6">
+              <h3 className="text-sm font-bold text-[#111827]">Team credits</h3>
+              <div className="mt-3 grid gap-2 sm:grid-cols-2">
+                {[
+                  ["M0403241091", "Muhammad Irfan Daniswara"],
+                  ["M0403241121", "Nabil Musannif Siregar"],
+                  ["M0403241054", "ANNISA AZZAHRA KUSMAWAN"],
+                  ["M0403241105", "Mochamad Aleandre Moulidouane", "Programmer"],
+                  ["M0403241097", "Ferdy Alfalah"],
+                  ["M0403241164", "Nailah Adianti Hermawan"],
+                  ["M0403241013", "Muhammad Wafi Robbani"],
+                  ["M0403241006", "Candra Agung Alief Prasetyo", "UI/UX Designer"],
+                  ["M0403241026", "Taufiq Sadri", "Programmer"],
+                  ["M0403241122", "Muhammad Rezonaldo Yunus"],
+                ].map(([id, name, role]) => (
+                  <div key={id} className="rounded-lg border border-[#eef0f2] bg-[#fbfcfd] px-3 py-2.5">
+                    <p className="font-mono text-[10px] text-[#6b7280]">{id}</p>
+                    <p className="mt-1 text-sm font-semibold text-[#374151]">{name}</p>
+                    {role && <p className="mt-0.5 text-xs font-medium text-emerald-700">{role}</p>}
+                  </div>
+                ))}
+              </div>
+            </div>
           </div>
         </div>
       )}
