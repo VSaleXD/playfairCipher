@@ -71,6 +71,31 @@ function transform(value, grid, direction, decrypt = false) {
     .join("");
 }
 
+function getTransformationSteps(value, grid) {
+  const positions = new Map(
+    grid.map((letter, index) => [letter, [Math.floor(index / 5), index % 5]]),
+  );
+
+  return makePairs(value).map(([first, second], index) => {
+    const firstPosition = positions.get(first);
+    const secondPosition = positions.get(second);
+    const output = transform(`${first}${second}`, grid, 1);
+    let rule = "Rectangle rule";
+    if (firstPosition?.[0] === secondPosition?.[0]) rule = "Same row rule";
+    if (firstPosition?.[1] === secondPosition?.[1]) rule = "Same column rule";
+
+    return {
+      id: index + 1,
+      input: `${first}${second}`,
+      output,
+      rule,
+      firstPosition,
+      secondPosition,
+      outputPositions: [positions.get(output[0]), positions.get(output[1])],
+    };
+  });
+}
+
 function App() {
   const [key, setKey] = useState("MONARCHY");
   const [grid, setGrid] = useState(() => makeGrid("MONARCHY"));
@@ -78,7 +103,14 @@ function App() {
   const [cipherText, setCipherText] = useState("");
   const [plainText, setPlainText] = useState("");
   const [notice, setNotice] = useState("");
+  const [activeTransformation, setActiveTransformation] = useState(0);
   const fileInput = useRef(null);
+
+  const transformations = cipherText
+    ? getTransformationSteps(message, grid)
+    : [];
+  const selectedTransformation =
+    transformations[activeTransformation] || transformations[0];
 
   const updateKey = (value) => {
     setKey(value);
@@ -101,6 +133,7 @@ function App() {
       return setNotice("Masukkan pesan terlebih dahulu.");
     const result = transform(message, grid, 1);
     setCipherText(result);
+    setActiveTransformation(0);
     setNotice("Pesan berhasil dienkripsi.");
   };
 
@@ -114,6 +147,57 @@ function App() {
     setPlainText(result);
     setNotice("Ciphertext berhasil didekripsi.");
   };
+
+  const tryExample = () => {
+    const exampleKey = "ALANGESHPUB";
+    setKey(exampleKey);
+    setGrid(makeGrid(exampleKey));
+    setMessage("temui ibu nanti malam");
+    setCipherText("");
+    setPlainText("");
+    setNotice("Contoh Playfair siap digunakan.");
+  };
+
+  const resetApp = () => {
+    setKey("MONARCHY");
+    setGrid(makeGrid("MONARCHY"));
+    setMessage("INSTRUMEN RAHASIA");
+    setCipherText("");
+    setPlainText("");
+    setNotice("");
+    setActiveTransformation(0);
+  };
+
+  const copyResult = async () => {
+    if (!cipherText) return setNotice("Belum ada hasil untuk disalin.");
+    await navigator.clipboard?.writeText(cipherText);
+    setNotice("Ciphertext berhasil disalin.");
+  };
+
+  const downloadResult = () => {
+    if (!cipherText) return setNotice("Belum ada hasil untuk diunduh.");
+    const blob = new Blob([cipherText], { type: "text/plain" });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement("a");
+    link.href = url;
+    link.download = "playfair-cipher.txt";
+    link.click();
+    URL.revokeObjectURL(url);
+    setNotice("Ciphertext berhasil diunduh.");
+  };
+
+  const shareResult = async () => {
+    if (!cipherText) return setNotice("Belum ada hasil untuk dibagikan.");
+    if (navigator.share) {
+      await navigator.share({ title: "Playfair Cipher", text: cipherText });
+      setNotice("Ciphertext siap dibagikan.");
+      return;
+    }
+    await navigator.clipboard?.writeText(cipherText);
+    setNotice("Browser tidak mendukung Share. Ciphertext disalin.");
+  };
+
+  const clearMessage = () => setMessage("");
 
   const readFile = (event) => {
     const file = event.target.files?.[0];
@@ -136,15 +220,24 @@ function App() {
           <h1>Playfair Cipher</h1>
           <p>Text Encryption &amp; Decryption</p>
         </div>
-        <span className="header-link">About</span>
       </header>
       <main className="container">
         <section className="intro">
-          <h2>Encrypt &amp; Decrypt Text</h2>
-          <p>
-            Your text is processed locally in your browser. We do not save,
-            upload, or share your data.
-          </p>
+          <div>
+            <h2>Encrypt &amp; Decrypt Text</h2>
+            <p>
+              Your text is processed locally in your browser. We do not save,
+              upload, or share your data.
+            </p>
+          </div>
+          <div className="intro-actions">
+            <button type="button" className="try-button" onClick={tryExample}>
+              Try example
+            </button>
+            <button type="button" className="reset-button" onClick={resetApp}>
+              Reset
+            </button>
+          </div>
         </section>
         <section className="workspace">
           <div className="form-container">
@@ -153,7 +246,13 @@ function App() {
                 <label htmlFor="message">Input Text</label>
                 <p>Type text manually or load a plain text file.</p>
               </div>
-              <span>Clear</span>
+              <button
+                type="button"
+                className="clear-button"
+                onClick={clearMessage}
+              >
+                Clear
+              </button>
             </div>
             <textarea
               id="message"
@@ -278,7 +377,143 @@ function App() {
                 placeholder="Plain text will appear here"
               />
             </div>
+            <div className="result-actions">
+              <button type="button" onClick={copyResult}>
+                Copy
+              </button>
+              <button type="button" onClick={downloadResult}>
+                Download .txt
+              </button>
+              <button type="button" onClick={shareResult}>
+                Share
+              </button>
+            </div>
           </div>
+        </section>
+        <section className="transformation-section">
+          <div className="transformation-heading">
+            <div>
+              <span className="eyebrow">LEARN BY DOING</span>
+              <h2>Transformation</h2>
+              <p>Follow one character pair at a time through the key matrix.</p>
+            </div>
+            <span className="transformation-count">
+              {transformations.length
+                ? `${activeTransformation + 1} / ${transformations.length}`
+                : "Run Encrypt to explore"}
+            </span>
+          </div>
+          {selectedTransformation ? (
+            <>
+              <div className="transformation-card">
+                <div className="pair-heading">
+                  <div className="pair-label">
+                    PAIR {selectedTransformation.id} OF {transformations.length}
+                  </div>
+                  <div className="pair-result">
+                    <strong>{selectedTransformation.input}</strong>
+                    <span>→</span>
+                    <strong>{selectedTransformation.output}</strong>
+                  </div>
+                </div>
+                <div className="transformation-controls">
+                  <button
+                    type="button"
+                    onClick={() =>
+                      setActiveTransformation(
+                        Math.max(0, activeTransformation - 1),
+                      )
+                    }
+                    disabled={activeTransformation === 0}
+                  >
+                    ← Previous
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() =>
+                      setActiveTransformation(
+                        Math.min(
+                          transformations.length - 1,
+                          activeTransformation + 1,
+                        ),
+                      )
+                    }
+                    disabled={
+                      activeTransformation === transformations.length - 1
+                    }
+                  >
+                    Next →
+                  </button>
+                </div>
+                <div className="transformation-content">
+                  <div className="transform-grid">
+                    {grid.map((letter, index) => {
+                      const isInput = [
+                        selectedTransformation.firstPosition,
+                        selectedTransformation.secondPosition,
+                      ].some(([row, column]) => index === row * 5 + column);
+                      const isOutput =
+                        selectedTransformation.outputPositions.some(
+                          ([row, column]) => index === row * 5 + column,
+                        );
+                      return (
+                        <span
+                          key={index}
+                          className={
+                            isInput
+                              ? "transform-cell input-cell"
+                              : isOutput
+                                ? "transform-cell output-cell"
+                                : "transform-cell"
+                          }
+                        >
+                          {letter}
+                        </span>
+                      );
+                    })}
+                  </div>
+                  <aside className="rule-card">
+                    <span>{selectedTransformation.rule}</span>
+                    <div>
+                      <strong>{selectedTransformation.input}</strong>
+                      <em>→</em>
+                      <strong>{selectedTransformation.output}</strong>
+                    </div>
+                    <p>
+                      The arrows show each input character moving to its output
+                      cell.
+                    </p>
+                  </aside>
+                </div>
+                <div className="transformation-list-heading">
+                  <span>View all {transformations.length} transformations</span>
+                  <span>⌄</span>
+                </div>
+                <div className="transformation-list">
+                  {transformations.map((step) => (
+                    <button
+                      type="button"
+                      key={step.id}
+                      className={
+                        step.id === selectedTransformation.id ? "selected" : ""
+                      }
+                      onClick={() => setActiveTransformation(step.id - 1)}
+                    >
+                      #{step.id} {step.input} → {step.output}
+                    </button>
+                  ))}
+                </div>
+              </div>
+              <p className="transformation-note">
+                The selected pair follows the row, column, or rectangle rule
+                shown in the matrix.
+              </p>
+            </>
+          ) : (
+            <div className="empty-transformation">
+              Encrypt a message to see each pair move through the matrix.
+            </div>
+          )}
         </section>
       </main>
       <footer>
