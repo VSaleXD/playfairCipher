@@ -1452,6 +1452,63 @@ body {
     system-ui,
     sans-serif;
 }
+
+@keyframes matrix-cell-step {
+  0%,
+  100% {
+    transform: scale(1);
+    filter: brightness(1);
+  }
+  35% {
+    transform: scale(1.12) translateY(-3px);
+    filter: brightness(1.08);
+  }
+}
+
+@keyframes matrix-path-flow {
+  from {
+    stroke-dashoffset: 12;
+  }
+  to {
+    stroke-dashoffset: 0;
+  }
+}
+
+@keyframes matrix-path-glow {
+  0%,
+  100% {
+    opacity: 0.25;
+    transform: scale(0.7);
+  }
+  45% {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+.matrix-cell {
+  animation: matrix-cell-step 900ms cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+.matrix-path {
+  stroke-dasharray: 2 1;
+  animation: matrix-path-flow 850ms ease-out both;
+}
+
+.matrix-path-a {
+  animation-delay: 120ms;
+}
+
+.matrix-path-b {
+  animation-delay: 220ms;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .matrix-cell,
+  .matrix-path {
+    animation: none;
+  }
+}
 @property --tw-translate-x {
   syntax: "*";
   inherits: false;

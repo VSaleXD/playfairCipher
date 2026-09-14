@@ -144,7 +144,10 @@ function MatrixVisualization({ matrix, source, output }) {
             {matrix.flat().map((letter, idx) => (
               <span
                 key={`${letter}-${idx}`}
-                className={`grid aspect-square place-items-center rounded-md border font-mono text-sm font-bold transition ${getCellClass(letter)}`}
+                className={`${source.includes(letter) || output.includes(letter) ? "matrix-cell" : ""} grid aspect-square place-items-center rounded-md border font-mono text-sm font-bold transition ${getCellClass(letter)}`}
+                style={{
+                  animationDelay: `${output.includes(letter) ? 260 : 0}ms`,
+                }}
               >
                 {letter}
               </span>
@@ -180,6 +183,8 @@ function MatrixVisualization({ matrix, source, output }) {
             </defs>
             <path
               d={getPath(inputA, outA, sideA)}
+              key={`${source}-${output}-a`}
+              className="matrix-path matrix-path-a"
               fill="none"
               stroke="#059669"
               strokeWidth="1.1"
@@ -188,6 +193,8 @@ function MatrixVisualization({ matrix, source, output }) {
             />
             <path
               d={getPath(inputB, outB, sideB)}
+              key={`${source}-${output}-b`}
+              className="matrix-path matrix-path-b"
               fill="none"
               stroke="#047857"
               strokeWidth="1.1"
